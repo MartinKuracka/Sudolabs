@@ -1,25 +1,42 @@
-import logo from './logo.svg';
+import {useEffect, useState} from 'react';
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+  const [users, setUsers] = useState();
+
+  async function fetchData() {
+    const response = await fetch('https://randomuser.me/api/?results=10');
+    const results = await response.json();
+    setUsers(results.results.filter(users => users.gender === 'female'));
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (users) {
+    return (
+      <>
+      <div className="App">
+        <div className='buttonWrap'>
+          <button onClick={fetchData}>Fetch Again</button>
+        </div>
+        {users.map(user => (
+          <div className='content_container'>
+            <img src={user.picture.thumbnail} alt={user.name.last}/>
+            <div className='text'>
+              <p className='name'>{user.name.title + user.name.first + user.name.last }</p>
+              <p>{user.email}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      </>
+    );
+  } else {
+    return <h1>Loading...</h1>
+  }
 }
 
 export default App;
